@@ -17,7 +17,6 @@ var mapOptions = {
                 position: google.maps.ControlPosition.LEFT_TOP
         },
         fullscreenControl: true
-
 };
 
 $(document).ready(function() {
