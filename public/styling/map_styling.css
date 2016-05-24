@@ -1,0 +1,52 @@
+html, body {
+        height: 100%;
+        width: 100%;
+        padding:0%;
+        margin:0%;
+}
+
+img {
+        height:50%;
+        width: 50%;
+}
+
+tr {
+        width:100%;
+}
+
+td {
+        text-align: center;
+}
+
+#map {
+        height:100%;
+        width:100%;
+}
+
+.panel {
+        position: absolute;
+        left: 5%;
+        top: 8%;
+        height: 85%;
+        width: 25%;
+        padding: 5px;
+        z-index: 5;
+        border: 1px solid #999;
+        background: #fff;       
+}
+
+#pyt {
+        font-family: 'Open Sans';
+        font-weight: bold;
+        font-size: larger;
+}
+
+.panel-body {
+        text-align: center;
+}
+
+#subtitle {
+        font-family: 'Open Sans';
+        text-align: center;
+        color: grey;
+}

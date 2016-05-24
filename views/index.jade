@@ -1,0 +1,18 @@
+include ../node_modules/jade-bootstrap/components/panels.jade
+
+html(lang="en")
+        head
+                title Boston Harbor Islands | Ferry Scheduling
+                meta( charset='utf-8')
+                meta(http-equiv="X-UA-Compatible" content="IE=edge")
+                script( src="https://ajax.microsoft.com/ajax/jQuery/jquery-1.11.1.min.js")
+                meta(name="viewport" content="width=device-width, initial-scale=1")
+                link(href="styling/map_styling.css", rel="stylesheet", type="text/css")
+                link(href="http://fonts.googleapis.com/css?family=Lobster+Two" rel="stylesheet" type="text/css")
+                link(href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css")
+                script( src = 'https://maps.googleapis.com/maps/api/js')
+                script( src= 'scripts/map_interaction.js')
+        body
+                div#map
+                +panel-default("<table><tr><td><img src='images/boat.png' alt='Boat Glif'></td><td id='pyt'>Plan Your Trip</td></tr></table>")
+                        a#subtitle (Use the + button for a multi-island trip)

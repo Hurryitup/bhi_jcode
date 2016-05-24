@@ -1,0 +1,31 @@
+{
+  "name": "Boston_Harbor_Islands_Jumbocode",
+  "version": "0.2.0",
+  "description": "A ferry scheduling app for the Boston Harbor Islands",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "latest",
+    "gtfs": "latest",
+    "mongodb": "latest",
+    "body-parser": "latest",
+    "jade-bootstrap":"latest"
+  },
+  "engines": {
+    "node": "4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heroku/node-js-sample"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express",
+    "jade"
+  ],
+  "author": "Aditya Hurry",
+  "license": "MIT"
+}

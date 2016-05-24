@@ -1,0 +1,7 @@
+{
+  "name": "Boston Harbor Islands - Jumbocode",
+  "description": "A ferry scheduling app for the Boston Harbor Islands",
+  "repository": "https://github.com/adityahurry/my_jcode",
+  // "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "express", "static", "jade", "gtfs"]
+}
