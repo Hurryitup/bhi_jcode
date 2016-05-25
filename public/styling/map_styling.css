@@ -50,3 +50,34 @@ td {
         text-align: center;
         color: grey;
 }
+
+.container-fluid {
+        padding:0px !important;
+}
+
+.col-xs-3 {
+        padding-left: 0px !important;
+        padding-top: 15px;
+}
+
+#datepicker {
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    width:100%;
+    border-radius: 4px;
+}
+
+.date {
+        padding-top: 7%;
+        padding-left: 10% !important;
+}
+
+button {
+        border:0px;
+}
+
+#to {
+        padding-top: 10px !important;
+}
