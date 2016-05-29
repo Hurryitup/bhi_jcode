@@ -87,3 +87,7 @@ button {
 #to {
         padding-top: 10px !important;
 }
+
+.times {
+    min-width:0px !important;
+}
