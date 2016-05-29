@@ -25,10 +25,11 @@ td {
 
 .panel {
         position: absolute;
+        word-wrap:;
         left: 5%;
         top: 8%;
         height: 85%;
-        width: 25%;
+        width: 40%;
         padding: 5px;
         z-index: 5;
         border: 1px solid #999;
@@ -39,6 +40,10 @@ td {
         font-family: 'Open Sans';
         font-weight: bold;
         font-size: larger;
+}
+
+.panel-title {
+    padding-left: 17%
 }
 
 .panel-body {
@@ -53,25 +58,26 @@ td {
 
 .container-fluid {
         padding:0px !important;
+        padding-top: 2% !important;
 }
 
-.col-xs-3 {
-        padding-left: 0px !important;
+.island .dates {
         padding-top: 15px;
 }
 
-#datepicker {
+.datepicker {
     font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
     color: #333;
     width:100%;
     border-radius: 4px;
+    text-align: center;
 }
 
 .date {
-        padding-top: 7%;
-        padding-left: 10% !important;
+    padding-top: 1%;
+    /*padding-left: 5% !important;*/
 }
 
 button {

@@ -1,6 +1,6 @@
 var mapOptions = {
         zoom: 12,
-        center: {lat: 42.3118, lng: -71.05},
+        center: {lat: 42.309, lng: -71.07},
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         mapTypeControl: true,
         mapTypeControlOptions: {

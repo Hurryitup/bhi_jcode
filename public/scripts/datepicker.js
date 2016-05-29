@@ -1,5 +1,5 @@
 $(function() {
-    $( "#datepicker" ).datepicker({
+    $(".datepicker").datepicker({
       showButtonPanel: true
     });
 });
