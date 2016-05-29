@@ -35,12 +35,12 @@ html(lang="en")
         body
                 div#map
                 +panel-info("<table><tr><td><img src='images/boat.png' alt='Boat Glif'></td><td id='pyt'>Plan Your Trip</td></tr></table>")
-                        a#subtitle (Use the + button for a multi-island trip)
+                        span#subtitle (Use the + button for a multi-island trip)
                         table.table
                                 tbody
                                         tr
                                                 +waypoint("point")
                                         tr
-                                                div.container-fluid#to 
+                                                div.container-fluid#add_point 
                                                         button.btn.btn-success
                                                                 span.glyphicon.glyphicon-plus(aria-hidden=true)

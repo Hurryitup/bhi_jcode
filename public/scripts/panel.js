@@ -21,9 +21,10 @@ $("document").ready(function() {
         // Get stop data
         $.getJSON("https://transit.land//api/v1/stops?identifier_starts_with=gtfs://f-drt8-nps~boha~ferries", 
                 function (data) {
+                    console.log(data.stops);
                         data.stops.forEach(function (e) {
                                 stops_arr.push({"name":e.name, "osid":e.onestop_id});
-                                stops_dict[e.name] = e.onestop_id;
+                                stops_dict[e.name] = {"oid":e.onestop_id, "coordinates":{"lng":e.geometry.coordinates[0], "lat":e.geometry.coordinates[1]}};
                         });
                         // populate initial drop downs
                         var ulTemplateFront_stops = "<li class='selection startorstop' role='presentation'><a role='menuitem' tabindex='-1' href='#'>____</a></li>"
@@ -47,7 +48,7 @@ $("document").ready(function() {
                                 if ($(this).hasClass("start")) {
                                     // caching direct schedule-stop pairs for origin
                                     var this_name = $(this).context.firstChild.innerText;
-                                    var this_osid = stops_dict[this_name];
+                                    var this_osid = stops_dict[this_name].oid;
                                     $.getJSON("https://transit.land//api/v1/schedule_stop_pairs?origin_onestop_id="+this_osid+"&date=2016-06-29",
                                           function (data) {
                                                 cached_schedStopPairs[this_name] = data;
