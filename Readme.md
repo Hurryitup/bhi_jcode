@@ -8,8 +8,10 @@ TransitLand API - for consuming and making BHI's GTFS feeds available
 Valhalla by MapZen API - for their routing services
 
 ## Technologies used:
-Node.js
-Jade
-Bootstrap
-Google Maps
-JQuery
+<ul>
+        <li>Node.js</li>
+        <li>Jade</li>
+        <li>Bootstrap</li>
+        <li>Google Maps</li>
+        <li>JQuery</li>
+</ul>
