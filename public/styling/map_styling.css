@@ -91,3 +91,7 @@ button {
 .times {
     min-width:0px !important;
 }
+
+.time {
+    text-align: center;
+}
