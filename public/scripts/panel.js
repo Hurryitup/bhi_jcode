@@ -1,9 +1,11 @@
 var stops_arr = [];
-var stops_dict = {};
+var stops_dict_by_name = {};
+var stops_dict_by_oid = {};
 var shortened_stops = {};
 var cached_schedStopPairs = {};
 var cached_routeInfo = {};
 var replacementText = "____&nbsp;<span class='caret'></span>";
+var ulTemplateFront_stops = "<li class='selection startorstop' role='presentation' data-roid=&&&&><a role='menuitem' tabindex='-1' href='#'>____</a></li>"
 
 // utility function
 function getKeyForValue(dict, val) {
@@ -14,59 +16,77 @@ function getKeyForValue(dict, val) {
     }   
 }
 
+function cache_stop_data(stops) {
+    stops.forEach(function (e) {
+        stops_arr.push({"name":e.name, "osid":e.onestop_id});
+        var route_ids = [];
+        // saves only the salient information about each route – the route_onestop_id
+        e.routes_serving_stop.forEach(function (e) {route_ids.push(e.route_onestop_id);});
+        stops_dict_by_name[e.name] = {"oid":e.onestop_id, "coordinates":{"lng":e.geometry.coordinates[0], "lat":e.geometry.coordinates[1]}, "routes":route_ids};
+        stops_dict_by_oid[e.onestop_id] = {"name":e.name};
+        var splitText = e.name.split(" ");
+        var short_name = "";
+        // trims the last word off the name
+        for (var i = 0; i < splitText.length - 1; i++) {
+                short_name += splitText[i] + " ";
+        }
+        shortened_stops[e.name] = short_name.trim();
+    });
+}
+
+function populate_dropdown(dropdown, stops, startorstop) {
+    stops.forEach(function (e) {
+        dropdown.append(((ulTemplateFront_stops.replace("____", e.name)).replace("startorstop", startorstop)).replace("&&&&", e.osid));
+    });
+}
+
+function replace_button_text(dropdown_text, short_name) {
+    dropdown_text.html(replacementText.replace("____", short_name));
+}
+
+function cache_schedStopPairs(this_name) {
+    var this_osid = stops_dict_by_name[this_name].oid;
+    $.getJSON("https://transit.land//api/v1/schedule_stop_pairs?origin_onestop_id="+this_osid+"&date=2016-06-29",
+          function (data) {
+                cached_schedStopPairs[this_name] = data;
+          }
+    );
+}
+
 $("document").ready(function() {
     // Initialize datepicker
     $(".hasDatepicker").datepicker("setDate", new Date());
     // Get stop data
     $.getJSON("https://transit.land//api/v1/stops?identifier_starts_with=gtfs://f-drt8-nps~boha~ferries",
             function (data) {
-                // caches stop data for easier use
-                data.stops.forEach(function (e) {
-                    stops_arr.push({"name":e.name, "osid":e.onestop_id});
-                    var route_ids = [];
-                    // saves only the salient information about each route – the route_onestop_id
-                    e.routes_serving_stop.forEach(function (e) {route_ids.push(e.route_onestop_id);});
-                    stops_dict[e.name] = {"oid":e.onestop_id, "coordinates":{"lng":e.geometry.coordinates[0], "lat":e.geometry.coordinates[1]}, "routes":route_ids};
-                });
+                // caches stop data for easier/faster use
+                cache_stop_data(data.stops);
 
                 // populate initial drop downs
-                var ulTemplateFront_stops = "<li class='selection startorstop' role='presentation'><a role='menuitem' tabindex='-1' href='#'>____</a></li>"
-                stops_arr.forEach(function (e) {
-                    $(".From").append((ulTemplateFront_stops.replace("____", e.name)).replace("startorstop", "start"));
-                    $(".To").append((ulTemplateFront_stops.replace("____", e.name)).replace("startorstop", "stop"));
-                    var splitText = e.name.split(" ");
-                    var short_name = "";
-                    // trims the last word off the name
-                    for (var i = 0; i < splitText.length - 1; i++) {
-                            short_name += splitText[i] + " ";
-                    }
-                    shortened_stops[e.name] = short_name.trim();
-                });
+                populate_dropdown($(".From"), stops_arr, "start");
+                populate_dropdown($(".To"), stops_arr, "stop");
 
                 // add click trigger for dropdowns to populate main box when something has been selected
                 // also GETs and caches direct journey's from selected stop
                 $(".selection").click(function() {
-                    var dropdown_text = $(this).parent().prev();
-                    var short_name = shortened_stops[this.innerText.trim()];
-                    dropdown_text.html(replacementText.replace("____", short_name));
+                    var dropdown_dom_elem = $(this).parent().prev();
+                    var short_name = shortened_stops[dropdown_dom_elem.context.innerText.trim()];
+
+                    replace_button_text(dropdown_dom_elem, short_name);
+
                     if ($(this).hasClass("start")) {
                         // caching direct schedule-stop pairs for origin
-                        var this_name = $(this).context.firstChild.innerText;
-                        var this_osid = stops_dict[this_name].oid;
-                        $.getJSON("https://transit.land//api/v1/schedule_stop_pairs?origin_onestop_id="+this_osid+"&date=2016-06-29",
-                              function (data) {
-                                    cached_schedStopPairs[this_name] = data;
-                              }
-                        );
+                        cache_schedStopPairs($(this).context.firstChild.innerText);
+
                         // clears the 'To' and 'Times' dropdowns whenever a new 'From' is selected
-                        dropdown_text.parent().parent().next().children().children(".btn").html(replacementText.replace("____", "To"));
+                        dropdown_dom_elem.parent().parent().next().children().children(".btn").html(replacementText.replace("____", "To"));
                         empty_times($(this));
                     }
                     else if ($(this).hasClass("stop")){
-                        var from_shortName = dropdown_text.parent().parent().prev().children().children(".btn").text().trim();
+                        var from_shortName = dropdown_dom_elem.parent().parent().prev().children().children(".btn").text().trim();
                         var from_fullName = getKeyForValue(shortened_stops, from_shortName);
                         var to_fullName = getKeyForValue(shortened_stops, short_name);
-                        var to_avail_routes = stops_dict[to_fullName].routes;
+                        var to_avail_routes = stops_dict_by_name[to_fullName].routes;
                         var available_trips = cached_schedStopPairs[from_fullName].schedule_stop_pairs.filter(function (e) {
                             if (to_avail_routes.includes(e.route_onestop_id)) return true;
                         });
@@ -93,6 +113,22 @@ $("document").ready(function() {
     );
 });
 
+// unnecessary right now
+function populate_to_dropdowns(stops_served) {
+    console.log(stops_served);
+    var stops = [];
+    stops_served.schedule_stop_pairs.forEach(function (e) {
+        curr_stop = stops_dict_by_oid[e.destination_onestop_id].name;
+        if (stops.includes(curr_stop) == false) {
+            stops.push(curr_stop);
+        }
+    });
+    stops.sort();
+    stops.forEach(function (e) {
+        $(".To").append((ulTemplateFront_stops.replace("____", e)).replace("startorstop", "stop"));
+    })
+}
+
 function populate_times(available_trips, point) {
     empty_times(point);
     var ulTemplateFront_times = "<li class='selection time' role='presentation' data-roid=****><a role='menuitem' tabindex='-1' href='#'>____</a></li>"
@@ -108,7 +144,7 @@ function populate_times(available_trips, point) {
         }
     });
     for (key in time_accumulator) {
-        time_accumulator[key].sort(sort_times);
+        time_accumulator[key].sort(compare_times);
         time_accumulator[key].forEach(function (e) {
             var this_time = sanitize_time(e);
             available_times.append((ulTemplateFront_times.replace("____", this_time)).replace("****", key));
@@ -124,7 +160,7 @@ function populate_times(available_trips, point) {
     })
 }
 
-function sort_times(a, b) {
+function compare_times(a, b) {
     var atomized = a.split(":");
     var btomized = b.split(":");
     if (parseInt(atomized[0]) < parseInt(btomized[0])) return -1;
@@ -177,3 +213,21 @@ function clear_polylines() {
         cached_routeInfo[key].shape.setMap(null);
     }
 }
+
+
+
+// EDIC - Thompson stuff
+/*
+    var edic_thompson_roids = [stops_dict_by_name["EDIC Pier"].oid, stops_dict_by_name["Thompson Island"].oid];
+    if(this_name != "EDIC Pier" && this_name != "Thompson Island") {
+        edic_thompson_roids.forEach(function (e) {
+            var to = dropdown_dom_elem.parent().parent().next().children().children("ul").children("[data-roid='"+e+"']");
+            to.remove();
+        })    
+    }
+    else {
+        var delete_all_but = "[data-roid!='"+edic_thompson_roids[0]+"'][data-roid!='"+edic_thompson_roids[1]+"']";
+        var to = dropdown_dom_elem.parent().parent().next().children().children("ul").children(delete_all_but);
+        to.remove();
+    }
+*/
