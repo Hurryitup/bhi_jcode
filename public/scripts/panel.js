@@ -16,6 +16,7 @@ function getKeyForValue(dict, val) {
     }   
 }
 
+
 function cache_stop_data(stops) {
     stops.forEach(function (e) {
         stops_arr.push({"name":e.name, "osid":e.onestop_id});
@@ -23,6 +24,7 @@ function cache_stop_data(stops) {
         // saves only the salient information about each route – the route_onestop_id
         e.routes_serving_stop.forEach(function (e) {route_ids.push(e.route_onestop_id);});
         stops_dict_by_name[e.name] = {"oid":e.onestop_id, "coordinates":{"lng":e.geometry.coordinates[0], "lat":e.geometry.coordinates[1]}, "routes":route_ids};
+        console.log("name: " + e.name  + " lat: " + stops_dict_by_name[e.name].coordinates.lat, "lng: " + stops_dict_by_name[e.name].coordinates.lng);
         stops_dict_by_oid[e.onestop_id] = {"name":e.name};
         var splitText = e.name.split(" ");
         var short_name = "";
@@ -31,7 +33,9 @@ function cache_stop_data(stops) {
                 short_name += splitText[i] + " ";
         }
         shortened_stops[e.name] = short_name.trim();
+        cache_schedStopPairs(e);
     });
+    console.log(cached_schedStopPairs);
 }
 
 function populate_dropdown(dropdown, stops, startorstop) {
@@ -76,7 +80,7 @@ $("document").ready(function() {
 
                     if ($(this).hasClass("start")) {
                         // caching direct schedule-stop pairs for origin
-                        cache_schedStopPairs($(this).context.firstChild.innerText);
+                        // cache_schedStopPairs($(this).context.firstChild.innerText);
 
                         // clears the 'To' and 'Times' dropdowns whenever a new 'From' is selected
                         dropdown_dom_elem.parent().parent().next().children().children(".btn").html(replacementText.replace("____", "To"));
@@ -97,6 +101,7 @@ $("document").ready(function() {
                             alert("Sorry, there are no direct trips from " + from_fullName + " to " + to_fullName);
                             empty_times($(this));
                         }
+                        multi_stop_search(from_fullName, to_fullName);
                     }
                 });
             }
@@ -112,6 +117,11 @@ $("document").ready(function() {
             }
     );
 });
+
+// google maps directions service
+function multi_stop_search(from, to) {
+
+}
 
 // unnecessary right now
 function populate_to_dropdowns(stops_served) {
