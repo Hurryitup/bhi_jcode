@@ -56,49 +56,28 @@ function cache_schedStopPairs(this_name) {
 $("document").ready(function() {
     // Initialize datepicker
     $(".hasDatepicker").datepicker("setDate", new Date());
+
+    // Plus button trigger
+    $("#add_point").click(function() {
+        var prev_point = $(this).prev();
+        var from = ((prev_point.children(".island:nth-child(1)")))[0];
+        var to = ((prev_point.children(".island:nth-child(2)")))[0];
+        var new_point = prev_point.clone();
+        console.log(to);
+        // console.log((new_point.children(".island:nth-child(1)"))[0]);
+        // (new_point.children(".island:nth-child(2)"))[0].innerText = to;
+        prev_point.before(new_point);
+        button_triggers();
+    });
+
     // Get stop data
     $.getJSON("https://transit.land//api/v1/stops?identifier_starts_with=gtfs://f-drt8-nps~boha~ferries",
             function (data) {
                 // caches stop data for easier/faster use
                 cache_stop_data(data.stops);
 
-                // populate initial drop downs
-                populate_dropdown($(".From"), stops_arr, "start");
-                populate_dropdown($(".To"), stops_arr, "stop");
+                button_triggers();
 
-                // add click trigger for dropdowns to populate main box when something has been selected
-                // also GETs and caches direct journey's from selected stop
-                $(".selection").click(function() {
-                    var dropdown_dom_elem = $(this).parent().prev();
-                    var short_name = shortened_stops[dropdown_dom_elem.context.innerText.trim()];
-
-                    replace_button_text(dropdown_dom_elem, short_name);
-
-                    if ($(this).hasClass("start")) {
-                        // caching direct schedule-stop pairs for origin
-                        cache_schedStopPairs($(this).context.firstChild.innerText);
-
-                        // clears the 'To' and 'Times' dropdowns whenever a new 'From' is selected
-                        dropdown_dom_elem.parent().parent().next().children().children(".btn").html(replacementText.replace("____", "To"));
-                        empty_times($(this));
-                    }
-                    else if ($(this).hasClass("stop")){
-                        var from_shortName = dropdown_dom_elem.parent().parent().prev().children().children(".btn").text().trim();
-                        var from_fullName = getKeyForValue(shortened_stops, from_shortName);
-                        var to_fullName = getKeyForValue(shortened_stops, short_name);
-                        var to_avail_routes = stops_dict_by_name[to_fullName].routes;
-                        var available_trips = cached_schedStopPairs[from_fullName].schedule_stop_pairs.filter(function (e) {
-                            if (to_avail_routes.includes(e.route_onestop_id)) return true;
-                        });
-                        if(available_trips.length > 0) {
-                            populate_times(available_trips, $(this));
-                        }
-                        else {
-                            alert("Sorry, there are no direct trips from " + from_fullName + " to " + to_fullName);
-                            empty_times($(this));
-                        }
-                    }
-                });
             }
     );
     $.getJSON("https://transit.land//api/v1/routes?operated_by=o-drt8-bostonharborislandsnationalandstatepark",
@@ -112,6 +91,46 @@ $("document").ready(function() {
             }
     );
 });
+
+function button_triggers() {
+    // populate initial drop downs
+    populate_dropdown($(".From"), stops_arr, "start");
+    populate_dropdown($(".To"), stops_arr, "stop");
+
+    // add click trigger for dropdowns to populate main box when something has been selected
+    // also GETs and caches direct journey's from selected stop
+    $(".selection").click(function() {
+        var dropdown_dom_elem = $(this).parent().prev();
+        var short_name = shortened_stops[dropdown_dom_elem.context.innerText.trim()];
+
+        replace_button_text(dropdown_dom_elem, short_name);
+
+        if ($(this).hasClass("start")) {
+            // caching direct schedule-stop pairs for origin
+            cache_schedStopPairs($(this).context.firstChild.innerText);
+
+            // clears the 'To' and 'Times' dropdowns whenever a new 'From' is selected
+            dropdown_dom_elem.parent().parent().next().children().children(".btn").html(replacementText.replace("____", "To"));
+            empty_times($(this));
+        }
+        else if ($(this).hasClass("stop")){
+            var from_shortName = dropdown_dom_elem.parent().parent().prev().children().children(".btn").text().trim();
+            var from_fullName = getKeyForValue(shortened_stops, from_shortName);
+            var to_fullName = getKeyForValue(shortened_stops, short_name);
+            var to_avail_routes = stops_dict_by_name[to_fullName].routes;
+            var available_trips = cached_schedStopPairs[from_fullName].schedule_stop_pairs.filter(function (e) {
+                if (to_avail_routes.includes(e.route_onestop_id)) return true;
+            });
+            if(available_trips.length > 0) {
+                populate_times(available_trips, $(this));
+            }
+            else {
+                alert("Sorry, there are no direct trips from " + from_fullName + " to " + to_fullName);
+                empty_times($(this));
+            }
+        }
+    });
+}
 
 // unnecessary right now
 function populate_to_dropdowns(stops_served) {
